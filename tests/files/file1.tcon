@@ -1,0 +1,11 @@
+a: apple
+
+b: banana
+
+c: [cat cut]
+
+d: [
+    dog
+    door
+    dime: dollar
+]

@@ -1,0 +1,10 @@
+{
+    "a": "apple",
+    "b": "banana",
+    "c": ["cat", "cut"],
+    "d": {
+        "0": "dog",
+        "1": "door",
+        "dime": "dollar"
+    }
+}
