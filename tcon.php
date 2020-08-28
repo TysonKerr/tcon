@@ -3,6 +3,7 @@
 namespace tcon;
 class Exception extends \Exception {}
 
+/*
 const MAX_DEPTH = 512;
 
 const STRING_ENCLOSURE = 1;
@@ -161,4 +162,193 @@ function parse_value($val) {
     }
     
     return $val;
+}
+*/
+
+class Tcon {
+    const MAX_DEPTH = 512;
+
+    const STRING_ENCLOSURE = 1;
+    const OBJECT_START     = 2;
+    const OBJECT_END       = 3;
+    const KEY_SEPARATOR    = 4;
+
+    const SPECIAL_CHARS = [
+        '"' => self::STRING_ENCLOSURE,
+        "'" => self::STRING_ENCLOSURE,
+        '[' => self::OBJECT_START,
+        ']' => self::OBJECT_END,
+        '{' => self::OBJECT_START,
+        '}' => self::OBJECT_END,
+        ',' => 5,
+        ':' => self::KEY_SEPARATOR,
+    ];
+    
+    public static function parse($str, $as_array = true) {
+        $vals = (new self($str))->parse_array();
+        
+        if ($as_array) return $vals;
+        
+        switch (count($vals)) {
+            case 0: return null; // if nothing found, return null
+            case 1: return array_key_exists(0, $vals) ? $vals[0] : $vals; // if only 1 thing found, without a specified key, return that thing
+            default: return $vals; // if many things found, return implied array
+        }
+    }
+    
+    private function __construct($str, $i = 0, $depth = 0) {
+        $this->str = $str;
+        $this->i = $i;
+        $this->depth = $depth;
+        $this->vals = [];
+        $this->strings = [];
+        $this->parse_last_str = false;
+    }
+    
+    private function parse_array() {
+        if ($this->depth++ > self::MAX_DEPTH) throw new Exception('too deep');
+        
+        $val_has_key = false;
+        
+        while (isset($this->str[$this->i])) {
+            $next = $this->read_next_val($enclosed);
+            
+            if ($next === null or $next === self::OBJECT_END) {
+                break;
+            } else if ($next === self::KEY_SEPARATOR) {
+                if (!isset($this->strings[0]) or $val_has_key) {
+                    throw new Exception('No key defined');
+                }
+                
+                $val_has_key = true;
+            } else {
+                $this->store_val($next, $val_has_key, $enclosed);
+                $val_has_key = false;
+            }
+        }
+        
+        if ($val_has_key) throw new Exception('No value defined');
+        
+        if (isset($this->strings[0])) {
+            $this->add_property(array_pop($this->strings));
+        }
+        
+        return $this->vals;
+    }
+    
+    private function read_next_val(&$enclosed) {
+        $enclosed = true;
+        
+        while (isset($this->str[$this->i])) {
+            $char = $this->str[$this->i++];
+            
+            if (ctype_space($char) or $char === ',') continue;
+            
+            switch (self::SPECIAL_CHARS[$char] ?? 0) {
+                case self::KEY_SEPARATOR:    return self::KEY_SEPARATOR;
+                case self::OBJECT_END:       return self::OBJECT_END;
+                case self::OBJECT_START:     return $this->parse_sub_array();
+                case self::STRING_ENCLOSURE: return $this->parse_enclosed_string($char);
+                default:  $enclosed = false; return $this->parse_unenclosed_string();
+            }
+        }
+        
+        return null; // end of string
+    }
+    
+    private function parse_sub_array() {
+        $parser = new self($this->str, $this->i, $this->depth);
+        $val = $parser->parse_array();
+        $this->i = $parser->i;
+        return $val;
+    }
+    
+    private function parse_enclosed_string($enclosure) {
+        $start = $this->i;
+        $escaped = false;
+        $len = 0;
+        
+        for (; isset($this->str[$this->i]); ++$this->i) {
+            if ($escaped) {
+                $escaped = false;
+            } else if ($this->str[$this->i] === $enclosure) {
+                ++$this->i;
+                break;
+            } else if ($this->str[$this->i] === '\\') {
+                $escaped = true;
+            }
+            
+            ++$len;
+        }
+        
+        return substr($this->str, $start, $len);
+    }
+    
+    private function parse_unenclosed_string() {
+        // we already read the first character, start substring from there
+        $start = $this->i - 1;
+        $len = 1;
+        
+        for (; isset($this->str[$this->i]); ++$this->i) {
+            $char = $this->str[$this->i];
+            
+            if (isset(self::SPECIAL_CHARS[$char]) or ctype_space($char)) {
+                break;
+            }
+            
+            ++$len;
+        }
+        
+        return substr($this->str, $start, $len);
+    }
+
+    private function store_val($val, $has_key, $enclosed) {
+        if ($has_key) {
+            if (is_string($val)) {
+                $this->strings[] = $val;
+            } else {
+                $this->add_property($val);
+            }
+        } else {
+            if (isset($this->strings[0])) {
+                $this->add_property(array_pop($this->strings));
+            }
+            
+            if (is_string($val)) {
+                $this->strings[] = $val;
+            } else {
+                $this->vals[] = $val;
+            }
+        }
+        
+        $this->parse_last_str = !$enclosed;
+    }
+
+    private function add_property($val) {
+        if ($this->parse_last_str and is_string($val)) {
+            $val = self::parse_value($val);
+        }
+        
+        if (isset($this->strings[0])) {
+            while (isset($this->strings[1])) {
+                $val = [array_pop($this->strings) => $val];
+            }
+            
+            $this->vals[array_pop($this->strings)] = $val;
+        } else {
+            $this->vals[] = $val;
+        }
+    }
+
+    private static function parse_value($val) {
+        $lower = strtolower($val);
+        
+        switch ($lower) {
+            case 'null':  return null;
+            case 'true':  return true;
+            case 'false': return false;
+        }
+        
+        return $val;
+    }
 }

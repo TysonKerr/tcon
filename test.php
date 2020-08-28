@@ -14,7 +14,7 @@ require __DIR__ . '/tcon.php';
 use function tcon\tcon_parse;
 
 function test_tcon($name, $input, $expected) {
-    $result = tcon_parse($input);
+    $result = tcon\Tcon::parse($input, false);
     $pass = $result === $expected;
     $display = $pass ? 'pass' : 'fail';
     
