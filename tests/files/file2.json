@@ -25,5 +25,7 @@
         ["gulp", "gum"],
         "gain",
         "gander"
-    ]
+    ],
+    
+    "h": ["a\r\nb"]
 }

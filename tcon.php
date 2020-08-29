@@ -27,6 +27,14 @@ const SPECIAL_CHARS = [
     "\n" => ROW_END,
 ];
 
+const ESCAPED_CHARS = [
+    'b' => "\010",
+    'f' => "\f",
+    'n' => "\n",
+    'r' => "\r",
+    't' => "\t",
+];
+
 function tcon_parse($str, $as_array = true) {
     $vals = parse_array($str);
     
@@ -96,14 +104,25 @@ function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
 }
 
 function parse_string($str, &$i, $enclosure = false) {
-    $len = $enclosure ? 0 : 1;
-    $start = $i - $len;
+    $len = 0;
+    // we incremented $i when we were reading the char that we detected as a
+    // string, so we need to re-read that for processing here
+    $i -= $enclosure ? 0 : 1;
+    $start = $i;
     $escaped = false;
     $substrs = [];
     
     do {
         if ($escaped) {
             $escaped = false;
+            
+            if ($str[$i] === "\r" and ($str[$i + 1] ?? 0) === "\n") {
+                $escaped = true;
+            } else if (isset(ESCAPED_CHARS[$str[$i]])) {
+                $substrs[] = ESCAPED_CHARS[$str[$i]];
+                $start++;
+                continue;
+            }
         } else if ($str[$i] === $enclosure) {
             ++$i;
             break;
