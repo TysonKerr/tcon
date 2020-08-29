@@ -8,12 +8,11 @@
 
 <?php
 
-set_time_limit(1);
-
 require __DIR__ . '/tcon.php';
 use function tcon\tcon_parse;
 
 function test_tcon($name, $input, $expected) {
+    set_time_limit(1);
     $result = tcon_parse($input, false);
     $pass = $result === $expected;
     $display = $pass ? 'pass' : 'fail';

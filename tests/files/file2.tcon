@@ -5,19 +5,19 @@ a:c:cut
 b: ball
 c: care
 
-d :> dog door donut
+d :< dog door donut
 
-e: > egg ent elm
+e: < egg ent elm
 
-f :> few four:five fix :> foot fowl
+f :< few four:five fix :< foot fowl
 
-g :> [
-    gi :> gib git
-    go :> goat goal
+g :< [
+    gi :< gib git
+    go :< goat goal
 ][
     gulp
     gum
 ] gain gander
 
-h :> a\
+h :< a\
 b

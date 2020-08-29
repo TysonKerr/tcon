@@ -1,0 +1,8 @@
+[
+    "hello world",
+    "how are you?",
+    "abc\r\ndef",
+    ["ant", "bat", "cat"],
+    ["dog", "eel", "fox"],
+    ["git", "\r\nhat"]
+]

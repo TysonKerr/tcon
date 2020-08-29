@@ -10,8 +10,9 @@ const OBJECT_START     = 2;
 const OBJECT_END       = 3;
 const KEY_SEPARATOR    = 4;
 const VAL_SEPARATOR    = 5;
-const ROW_START        = 6;
-const ROW_END          = 7;
+const LINE_AS_LIST     = 6;
+const LINE_AS_STRING   = 7;
+const ROW_END          = 8;
 
 const SPECIAL_CHARS = [
     '"' => STRING_ENCLOSURE,
@@ -22,7 +23,8 @@ const SPECIAL_CHARS = [
     '}' => OBJECT_END,
     ',' => VAL_SEPARATOR,
     ':' => KEY_SEPARATOR,
-    '>' => ROW_START,
+    '<' => LINE_AS_LIST,
+    '>' => LINE_AS_STRING,
     "\r" => ROW_END,
     "\n" => ROW_END,
 ];
@@ -94,13 +96,18 @@ function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
             case KEY_SEPARATOR:    return KEY_SEPARATOR;
             case OBJECT_END:       return OBJECT_END;
             case OBJECT_START:     return parse_array($str, $i, $depth);
-            case ROW_START:        return parse_array($str, $i, $depth, true);
+            case LINE_AS_LIST:     return parse_array($str, $i, $depth, true);
+            case LINE_AS_STRING:   return parse_line_as_string($str, $i);
             case STRING_ENCLOSURE: return parse_string($str, $i, $char);
             default: $enclosed = false; return parse_string($str, $i);
         }
     }
     
     return null; // end of string
+}
+
+function parse_line_as_string($str, &$i) {
+    return trim(parse_string($str, $i, "\r"));
 }
 
 function parse_string($str, &$i, $enclosure = false) {
@@ -113,24 +120,26 @@ function parse_string($str, &$i, $enclosure = false) {
     $substrs = [];
     
     do {
+        $char = $str[$i];
+        
         if ($escaped) {
             $escaped = false;
             
-            if ($str[$i] === "\r" and ($str[$i + 1] ?? 0) === "\n") {
+            if ($char === "\r" and ($str[$i + 1] ?? 0) === "\n") {
                 $escaped = true;
-            } else if (isset(ESCAPED_CHARS[$str[$i]])) {
-                $substrs[] = ESCAPED_CHARS[$str[$i]];
+            } else if (isset(ESCAPED_CHARS[$char])) {
+                $substrs[] = ESCAPED_CHARS[$char];
                 $start++;
                 continue;
             }
-        } else if ($str[$i] === $enclosure) {
+        } else if ($char === $enclosure or ($enclosure === "\r" and $char === "\n")) {
             ++$i;
             break;
         } else if ($enclosure === false and
-            (isset(SPECIAL_CHARS[$str[$i]]) or ctype_space($str[$i]))
+            (isset(SPECIAL_CHARS[$char]) or ctype_space($char))
         ) {
             break;
-        } else if ($str[$i] === '\\') {
+        } else if ($char === '\\') {
             $substrs[] = substr($str, $start, $len);
             $start = $i + 1;
             $len = 0;
