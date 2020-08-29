@@ -6,5 +6,7 @@
         "0": "dog",
         "1": "door",
         "dime": "dollar"
-    }
+    },
+    "e": "string \"double\" and 'single' quotes",
+    "string \"double\" and 'single' quotes": null
 }

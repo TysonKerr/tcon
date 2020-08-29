@@ -8,6 +8,7 @@ $tests = [
     ['a\tb', "a\tb"],
     ['a\t\r\nb', "a\t\r\nb"],
     ['a\:\>b', 'a:>b'],
+    [' aa `a\'b\'c"d"e` ', ['aa', 'a\'b\'c"d"e']],
     ['a b c', ['a', 'b', 'c']],
     ['a\ b \ ', ['a b', ' ']],
     [' apple,banana ', ['apple', 'banana']],

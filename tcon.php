@@ -17,6 +17,7 @@ const ROW_END          = 8;
 const SPECIAL_CHARS = [
     '"' => STRING_ENCLOSURE,
     "'" => STRING_ENCLOSURE,
+    "`" => STRING_ENCLOSURE,
     '[' => OBJECT_START,
     ']' => OBJECT_END,
     '{' => OBJECT_START,

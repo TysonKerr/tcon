@@ -9,3 +9,6 @@ d: [
     door
     dime: dollar
 ]
+
+e: `string "double" and 'single' quotes`
+`string "double" and 'single' quotes`: null
