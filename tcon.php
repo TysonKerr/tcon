@@ -9,6 +9,9 @@ const STRING_ENCLOSURE = 1;
 const OBJECT_START     = 2;
 const OBJECT_END       = 3;
 const KEY_SEPARATOR    = 4;
+const VAL_SEPARATOR    = 5;
+const ROW_START        = 6;
+const ROW_END          = 7;
 
 const SPECIAL_CHARS = [
     '"' => STRING_ENCLOSURE,
@@ -17,8 +20,11 @@ const SPECIAL_CHARS = [
     ']' => OBJECT_END,
     '{' => OBJECT_START,
     '}' => OBJECT_END,
-    ',' => 5,
+    ',' => VAL_SEPARATOR,
     ':' => KEY_SEPARATOR,
+    '>' => ROW_START,
+    "\r" => ROW_END,
+    "\n" => ROW_END,
 ];
 
 function tcon_parse($str, $as_array = true) {
@@ -33,7 +39,7 @@ function tcon_parse($str, $as_array = true) {
     }
 }
 
-function parse_array($str, &$i = 0, $depth = 0) {
+function parse_array($str, &$i = 0, $depth = 0, $row_end = false) {
     if (++$depth > MAX_DEPTH) throw new Exception('too deep');
     
     $vals = [];
@@ -42,7 +48,7 @@ function parse_array($str, &$i = 0, $depth = 0) {
     $parse_last_str = false;
     
     while (isset($str[$i])) {
-        $next_val = read_next_val($str, $i, $depth, $enclosed);
+        $next_val = read_next_val($str, $i, $depth, $enclosed, $row_end);
         
         if ($next_val === null or $next_val === OBJECT_END) {
             break;
@@ -65,18 +71,22 @@ function parse_array($str, &$i = 0, $depth = 0) {
     return $vals;
 }
 
-function read_next_val($str, &$i, $depth, &$enclosed) {
+function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
     $enclosed = true;
     
     while (isset($str[$i])) {
         $char = $str[$i++];
         
-        if (ctype_space($char) or $char === ',') continue;
+        if ($row_end and (SPECIAL_CHARS[$char] ?? 0) === ROW_END) return null;
+        
+        if (ctype_space($char)) continue;
         
         switch (SPECIAL_CHARS[$char] ?? 0) {
+            case VAL_SEPARATOR:    continue 2; // treat as whitespace
             case KEY_SEPARATOR:    return KEY_SEPARATOR;
             case OBJECT_END:       return OBJECT_END;
             case OBJECT_START:     return parse_array($str, $i, $depth);
+            case ROW_START:        return parse_array($str, $i, $depth, true);
             case STRING_ENCLOSURE: return parse_enclosed_string($str, $i, $char);
             default: $enclosed = false; return parse_unenclosed_string($str, $i);
         }
@@ -130,7 +140,9 @@ function store_val($val, &$vals, &$strings, $has_key, &$parse_last_str, $enclose
             add_property($val, $vals, $strings, false);
         }
     } else {
-        if (isset($strings[0])) add_property(array_pop($strings), $vals, $strings, $parse_last_str);
+        if (isset($strings[0])) {
+            add_property(array_pop($strings), $vals, $strings, $parse_last_str);
+        }
         
         if (is_string($val)) {
             $strings[] = $val;

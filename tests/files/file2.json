@@ -1,0 +1,29 @@
+{
+    "a": {
+        "b": "bat",
+        "c": "cut"
+    },
+    
+    "b": "ball",
+    "c": "care",
+    
+    "d": ["dog", "door", "donut"],
+    
+    "e": ["egg", "ent", "elm"],
+    
+    "f": {
+        "0": "few",
+        "four": "five",
+        "fix": ["foot", "fowl"]
+    },
+    
+    "g": [
+        {
+            "gi": ["gib", "git"],
+            "go": ["goat", "goal"]
+        },
+        ["gulp", "gum"],
+        "gain",
+        "gander"
+    ]
+}
