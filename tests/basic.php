@@ -8,6 +8,8 @@ $tests = [
     [' apple,banana ', ['apple', 'banana']],
     [' "abc def \'ghi\' " ', "abc def 'ghi' "],
     [" 'abc def \"ghi\" ' ", 'abc def "ghi" '],
+    [' "abc\"def\"ghi" ', 'abc"def"ghi'],
+    [' ab\ cd\ ef ', 'ab cd ef'],
     [' "abc" "def" ', ['abc', 'def']],
     [' "abc""def" ', ['abc', 'def']],
     [' apple banana ', ['apple', 'banana']],

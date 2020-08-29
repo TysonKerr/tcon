@@ -87,49 +87,57 @@ function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
             case OBJECT_END:       return OBJECT_END;
             case OBJECT_START:     return parse_array($str, $i, $depth);
             case ROW_START:        return parse_array($str, $i, $depth, true);
-            case STRING_ENCLOSURE: return parse_enclosed_string($str, $i, $char);
-            default: $enclosed = false; return parse_unenclosed_string($str, $i);
+            case STRING_ENCLOSURE: return parse_string($str, $i, $char);
+            default: $enclosed = false; return parse_string($str, $i);
         }
     }
     
     return null; // end of string
 }
 
-function parse_enclosed_string($str, &$i, $enclosure) {
-    $start = $i;
+function parse_string($str, &$i, $enclosure = false) {
+    $len = $enclosure ? 0 : 1;
+    $start = $i - $len;
     $escaped = false;
-    $len = 0;
+    $substrs = [];
     
-    for (; isset($str[$i]); ++$i) {
+    do {
         if ($escaped) {
             $escaped = false;
         } else if ($str[$i] === $enclosure) {
             ++$i;
             break;
+        } else if ($enclosure === false and
+            (isset(SPECIAL_CHARS[$str[$i]]) or ctype_space($str[$i]))
+        ) {
+            break;
         } else if ($str[$i] === '\\') {
+            $substrs[] = substr($str, $start, $len);
+            $start = $i + 1;
+            $len = 0;
             $escaped = true;
+            continue;
         }
         
         ++$len;
-    }
+    } while(isset($str[++$i]));
     
-    return substr($str, $start, $len);
+    $substrs[] = substr($str, $start, $len);
+    return implode('', $substrs);
 }
 
-function parse_unenclosed_string($str, &$i) {
-    // already read first char, start from there
-    $start = $i - 1;
-    $len = 1;
+function get_str_without_escape_char($str) {
+    $substrs = explode('\\', $str);
     
-    for (; isset($str[$i]); ++$i) {
-        if (isset(SPECIAL_CHARS[$str[$i]]) or ctype_space($str[$i])) {
-            break;
-        }
-        
-        ++$len;
+    if (count($substrs) > 1) {
+        echo '<pre>'; var_dump($substrs); echo '</pre>';
     }
     
-    return substr($str, $start, $len);
+    foreach ($substrs as $i => $substr) {
+        if ($substr === '') unset($substrs[$i]);
+    }
+    
+    return implode('\\', $substrs);
 }
 
 function store_val($val, &$vals, &$strings, $has_key, &$parse_last_str, $enclosed) {
