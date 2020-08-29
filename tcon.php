@@ -222,5 +222,7 @@ function parse_value($val) {
         case 'false': return false;
     }
     
+    if (is_numeric($val)) return $val - 0;
+    
     return $val;
 }
