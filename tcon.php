@@ -149,27 +149,34 @@ function parse_string($str, &$i, $enclosure = false) {
     do {
         $char = $str[$i];
         
-        if ($char === '#') break;
-        if ($char === '/' and ($str[$i+1] === '/' or $str[$i+1] === '*')) break;
-        
         if ($escaped) {
-            $escaped = false;
-            
             if ($char === "\r" and ($str[$i + 1] ?? 0) === "\n") {
-                $escaped = true;
+                ++$i;
+                $len += 2;
             } else if (isset(ESCAPED_CHARS[$char])) {
                 $substrs[] = ESCAPED_CHARS[$char];
                 $start++;
-                continue;
+            } else {
+                ++$len;
+            }
+            
+            $escaped = false;
+            continue;
+        }
+        
+        if ($enclosure === false) {
+            if (isset(SPECIAL_CHARS[$char]) or ctype_space($char)
+                or $char === '#'
+                or ($char === '/' and ($str[$i+1] === '/' or $str[$i+1] === '*'))
+            ) {
+                break;
             }
         } else if ($char === $enclosure or ($enclosure === "\r" and $char === "\n")) {
             ++$i;
             break;
-        } else if ($enclosure === false and
-            (isset(SPECIAL_CHARS[$char]) or ctype_space($char))
-        ) {
-            break;
-        } else if ($char === '\\') {
+        }
+        
+        if ($char === '\\') {
             $substrs[] = substr($str, $start, $len);
             $start = $i + 1;
             $len = 0;
