@@ -85,7 +85,7 @@ function parse_array($str, &$i = 0, $depth = 0, $row_end = false) {
 function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
     $enclosed = true;
     
-    while (isset($str[$i])) {
+    while (isset($str[$i]) and skip_comments($str, $i)) {
         $char = $str[$i++];
         
         if ($row_end and (SPECIAL_CHARS[$char] ?? 0) === ROW_END) return null;
@@ -105,6 +105,32 @@ function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
     }
     
     return null; // end of string
+}
+
+function skip_comments($str, &$i) {
+    while (isset($str[$i])) {
+        $char = $str[$i];
+        $next = $str[$i + 1] ?? null;
+        
+        if ($char === '#' or ($char === '/' and $next === '/')) {
+            do {
+                $char = $str[++$i] ?? null;
+            } while (isset($char) and $char !== "\r" and $char !== "\n");
+        } else if ($char === '/' and $next === '*') {
+            do {
+                $char = $str[++$i] ?? null;
+                $next = $str[$i + 1] ?? null;
+            } while (isset($char) and ($char !== '*' or $next !== '/'));
+            
+            if (isset($next)) $i += 2;
+            
+            continue;
+        }
+        
+        break;
+    }
+    
+    return isset($str[$i]);
 }
 
 function parse_line_as_string($str, &$i) {

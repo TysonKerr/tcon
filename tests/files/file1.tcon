@@ -12,3 +12,12 @@ d: [
 
 e: `string "double" and 'single' quotes`
 `string "double" and 'single' quotes`: null
+
+// comment /*
+f: frog // comment
+
+/* comment *//* comment */
+g: giraffe /* comment */
+
+# comment
+h: horse # comment

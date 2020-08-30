@@ -8,5 +8,8 @@
         "dime": "dollar"
     },
     "e": "string \"double\" and 'single' quotes",
-    "string \"double\" and 'single' quotes": null
+    "string \"double\" and 'single' quotes": null,
+    "f": "frog",
+    "g": "giraffe",
+    "h": "horse"
 }
