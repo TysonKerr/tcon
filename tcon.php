@@ -149,6 +149,9 @@ function parse_string($str, &$i, $enclosure = false) {
     do {
         $char = $str[$i];
         
+        if ($char === '#') break;
+        if ($char === '/' and ($str[$i+1] === '/' or $str[$i+1] === '*')) break;
+        
         if ($escaped) {
             $escaped = false;
             
