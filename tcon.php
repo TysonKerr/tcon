@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Copyright (c) 2020 TysonKerr
+ * 
+ * MIT License
+ *
+ * https://github.com/TysonKerr/tcon
+ */
+
 namespace tcon;
 class Exception extends \Exception {}
 
