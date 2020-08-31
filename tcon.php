@@ -13,6 +13,7 @@ const VAL_SEPARATOR    = 5;
 const LINE_AS_LIST     = 6;
 const LINE_AS_STRING   = 7;
 const ROW_END          = 8;
+const MULTI_LINE_STRING = 9;
 
 const SPECIAL_CHARS = [
     '"' => STRING_ENCLOSURE,
@@ -28,6 +29,7 @@ const SPECIAL_CHARS = [
     '>' => LINE_AS_STRING,
     "\r" => ROW_END,
     "\n" => ROW_END,
+    '%' => MULTI_LINE_STRING,
 ];
 
 const ESCAPED_CHARS = [
@@ -100,6 +102,7 @@ function read_next_val($str, &$i, $depth, &$enclosed, $row_end = false) {
             case LINE_AS_LIST:     return parse_array($str, $i, $depth, true);
             case LINE_AS_STRING:   return parse_line_as_string($str, $i);
             case STRING_ENCLOSURE: return parse_string($str, $i, $char);
+            case MULTI_LINE_STRING: return parse_ml_string($str, $i, $char);
             default: $enclosed = false; return parse_string($str, $i);
         }
     }
@@ -131,6 +134,22 @@ function skip_comments($str, &$i) {
     }
     
     return isset($str[$i]);
+}
+
+function parse_ml_string($str, &$i, $char) {
+    $string = parse_string($str, $i, $char);
+    $string = str_replace(["\r\n", "\n"], "\r", $string);
+    $lines = explode("\r", $string);
+    $last_line = array_pop($lines);
+    $indent = strlen($last_line);
+    $line_count = count($lines);
+    $trimmed_strings = [];
+    
+    for ($j = 1; $j < $line_count; ++$j) {
+        $trimmed_strings[] = substr($lines[$j], $indent);
+    }
+    
+    return implode("\n", $trimmed_strings);
 }
 
 function parse_line_as_string($str, &$i) {

@@ -8,6 +8,8 @@
 
 <?php
 
+set_time_limit(1);
+
 require __DIR__ . '/tcon.php';
 use function tcon\tcon_parse;
 

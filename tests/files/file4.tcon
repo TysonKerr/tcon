@@ -1,0 +1,14 @@
+%
+hello world
+how are you?
+%
+
+a: %
+    am i indented?
+    have i succeeded?
+    %
+
+b: % this is ignored
+    this is not \% with escaped chars
+      nor is this, and is indented
+    %

@@ -1,0 +1,7 @@
+{
+    "0": "hello world\nhow are you?",
+    
+    "a": "am i indented?\nhave i succeeded?",
+    
+    "b": "this is not % with escaped chars\n  nor is this, and is indented"
+}
