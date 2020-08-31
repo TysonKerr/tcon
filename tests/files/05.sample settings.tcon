@@ -1,0 +1,40 @@
+name: Sample
+id: a1234
+
+// array of filenames
+prepend_files :< file1 file2 file3
+
+opt1: true
+opt2: false
+
+max_login_attempts: 3,
+error_reporting: -1,
+
+/* null to represent no max */
+"max val": null
+
+checks: [
+    check1
+    check2
+    check3
+]
+
+// array key:pair values
+vals:< a:b c:d e:f
+
+more_vals: [
+    a: b
+    c: d
+    e: f
+]
+
+title:> Tcon Parsing Demo
+
+description: %
+    <h1>Tcon Parsing Demo</h1>
+    
+    <p>This is a multi line string.</p>
+    <p>If you need to use the percent sign in here, escape it first (\%).</p>
+    %
+
+detail: "quoted string"

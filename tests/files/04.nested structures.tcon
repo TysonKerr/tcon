@@ -1,0 +1,20 @@
+// inside a.b, c:d and e:f will be merged, but e:f will be overwritten to e:g
+a:b:c:d
+a:b:e:f
+a:b:e:g
+
+b:c:[d:e f:g]
+
+// c:d will be an array [e:f g:h]
+c:d:<e:f g:h
+
+// d: [e: [f:g h:[i]]]
+d:<e:<f:g h:<i
+
+e:< f g h
+
+f: {
+    g:< g1 g2
+    h:< h1 h2
+    i:< i1 i2
+}

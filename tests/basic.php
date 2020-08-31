@@ -65,5 +65,5 @@ $json_tests = [
 ];
 
 foreach ($json_tests as $i => $test) {
-    test_tcon("JSON $i:", $test, json_decode($test, true));
+    test_tcon("JSON $i", $test, json_decode($test, true));
 }
