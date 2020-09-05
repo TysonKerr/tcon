@@ -2,7 +2,7 @@ name: Sample
 id: a1234
 
 // array of filenames
-prepend_files :< file1 file2 file3
+prepend_files: [file1, file2, file3]
 
 opt1: true
 opt2: false
@@ -11,7 +11,7 @@ max_login_attempts: 3,
 error_reporting: -1,
 
 /* null to represent no max */
-"max val": null
+max val: null
 
 checks: [
     check1
@@ -20,7 +20,7 @@ checks: [
 ]
 
 // array key:pair values
-vals:< a:b c:d e:f
+vals:[a:b, c:d, e:f]
 
 more_vals: [
     a: b
@@ -28,7 +28,7 @@ more_vals: [
     e: f
 ]
 
-title:> Tcon Parsing Demo
+title: Tcon Parsing Demo
 
 description: %
     <h1>Tcon Parsing Demo</h1>

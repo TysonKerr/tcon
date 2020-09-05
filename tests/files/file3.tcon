@@ -1,11 +1,11 @@
-> hello world
-> how are you?
+hello world
+how are you?
 
-> abc\
+abc\
 def
 
-< ant bat cat
-< dog eel fox
+[ant, bat, cat]
+[dog, eel, fox]
 
-< git \
+git \
 hat

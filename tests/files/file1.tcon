@@ -2,7 +2,7 @@ a: apple
 
 b: banana
 
-c: [cat cut]
+c: [cat, cut]
 
 d: [
     dog

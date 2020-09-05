@@ -4,5 +4,5 @@
     "abc\r\ndef",
     ["ant", "bat", "cat"],
     ["dog", "eel", "fox"],
-    ["git", "\r\nhat"]
+    "git \r\nhat"
 ]

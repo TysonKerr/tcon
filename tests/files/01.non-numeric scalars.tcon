@@ -1,4 +1,5 @@
-ant "bat" 'cat' `dog` . + -
+ant "bat" 'cat' `dog`
+., +, -
 
 %
 I am a multi-line
@@ -10,8 +11,11 @@ string with no indent
         so is this, and is indented 4 spaced
     %
 
-> this line is read as a single trimmed string
-> this line has an escaped newline char\
+this line is read as a single trimmed string
+this line has an escaped newline char\
 and continues on the next line
 
-true false null
+be careful of unquoted commas, though
+these 2 lines actually end up as 3 values
+
+true, false, null

@@ -8,5 +8,9 @@
     "this line is read as a single trimmed string",
     "this line has an escaped newline char\r\nand continues on the next line",
     
+    "be careful of unquoted commas",
+    "though",
+    "these 2 lines actually end up as 3 values",
+    
     true, false, null
 ]

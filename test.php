@@ -3,13 +3,26 @@
 <head>
 	<meta charset="utf-8">
 	<title>TCON Test</title>
+    <style>
+        .pass {
+            background-color: #bfb;
+        }
+        .fail {
+            background-color: #fbb;
+        }
+        
+        h4 { margin: 10px 0 5px; }
+        pre { margin: 0; }
+    </style>
 </head>
 <body>
 
 <?php
 
 // note: this does not check element order
-function get_array_differences($arr1, $arr2) {
+function get_value_differences($arr1, $arr2) {
+    if (!is_array($arr1)) return $arr2;
+    if (!is_array($arr2)) return $arr1;
     $diffs = [];
     
     foreach ($arr1 as $key => $val) {
@@ -19,7 +32,7 @@ function get_array_differences($arr1, $arr2) {
         }
         
         if (is_array($val)) {
-            $val_diffs = get_array_differences($val, $arr2[$key]);
+            $val_diffs = get_value_differences($val, $arr2[$key]);
             
             if (count($val_diffs) > 0) {
                 $diffs[$key] = $val_diffs;
@@ -63,7 +76,7 @@ function test_tcon($name, $input, $expected) {
     $pass = $result === $expected;
     $display = $pass ? 'pass' : 'fail';
     
-    echo "<div>$name: $display</div>";
+    echo "<div class='$display'>$name: $display</div>";
     
     if (!$pass) {
         echo '<h4>input</h4><pre>';
@@ -72,8 +85,8 @@ function test_tcon($name, $input, $expected) {
         var_dump(htmlspecialchars_recursive($expected));
         echo '</pre><h4>result</h4><pre>';
         var_dump(htmlspecialchars_recursive($result));
-        echo '</pre><h4>diff</h4><pre>';
-        var_dump(htmlspecialchars_recursive(get_array_differences($result, $expected)));
+        echo '</pre><h4>array diffs</h4><pre>';
+        var_dump(htmlspecialchars_recursive(get_value_differences($result, $expected)));
         echo '</pre>';
     }
 }
